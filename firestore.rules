@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for UserSave entity
+    function isValidUserSave(data) {
+      return data.keys().hasAll(['userId', 'cash', 'totalDevastationCash', 'updatedAt'])
+        && data.userId is string
+        && data.userId.size() <= 128
+        && data.userId == request.auth.uid
+        && data.cash is number
+        && data.cash >= 0
+        && data.totalDevastationCash is number
+        && data.totalDevastationCash >= 0
+        && (!('callsign' in data) || (data.callsign is string && data.callsign.size() <= 64))
+        && (!('email' in data) || (data.email is string && data.email.size() <= 128))
+        && (!('selectedAssetId' in data) || (data.selectedAssetId is string && data.selectedAssetId.size() <= 64))
+        && (!('activeTheaterId' in data) || (data.activeTheaterId is string && data.activeTheaterId.size() <= 64))
+        && (!('unlockedWeapons' in data) || (data.unlockedWeapons is list && data.unlockedWeapons.size() <= 20))
+        && (!('achievements' in data) || (data.achievements is list && data.achievements.size() <= 20));
+    }
+
+    // Validation for Leaderboard entry
+    function isValidLeaderboardEntry(data) {
+      return data.keys().hasAll(['id', 'userId', 'commanderName', 'devastationScore', 'updatedAt'])
+        && data.id is string
+        && isValidId(data.id)
+        && data.userId is string
+        && data.userId == request.auth.uid
+        && data.commanderName is string
+        && data.commanderName.size() > 0
+        && data.commanderName.size() <= 64
+        && data.devastationScore is number
+        && data.devastationScore >= 0
+        && (!('highestTheater' in data) || (data.highestTheater is string && data.highestTheater.size() <= 64))
+        && (!('nuclearStrikes' in data) || (data.nuclearStrikes is number && data.nuclearStrikes >= 0));
+    }
+
+    // Validation for ActiveSession
+    function isValidActiveSession(data) {
+      return data.keys().hasAll(['id', 'userId', 'commanderName', 'activeTheaterId', 'x', 'z', 'updatedAt'])
+        && data.id is string
+        && isValidId(data.id)
+        && data.userId is string
+        && data.userId == request.auth.uid
+        && data.commanderName is string
+        && data.commanderName.size() <= 64
+        && data.activeTheaterId is string
+        && data.activeTheaterId.size() <= 64
+        && data.x is number
+        && data.z is number
+        && (!('altitude' in data) || data.altitude is number)
+        && (!('rotationY' in data) || data.rotationY is number)
+        && (!('lastAction' in data) || (data.lastAction is string && data.lastAction.size() <= 128));
+    }
+
+    // Validation for ChatMessage
+    function isValidChatMessage(data) {
+      return data.keys().hasAll(['id', 'userId', 'commanderName', 'activeTheaterId', 'text', 'createdAt'])
+        && data.id is string
+        && isValidId(data.id)
+        && data.userId is string
+        && data.userId == request.auth.uid
+        && data.commanderName is string
+        && data.commanderName.size() <= 64
+        && data.activeTheaterId is string
+        && data.activeTheaterId.size() <= 64
+        && data.text is string
+        && data.text.size() <= 280;
+    }
+
+    // User campaign saves
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserSave(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserSave(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isOwner(userId);
+    }
+
+    // Global Devastation Leaderboard
+    match /leaderboard/{entryId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isValidId(entryId) && isValidLeaderboardEntry(incoming());
+      allow update: if isSignedIn() && isValidId(entryId) && existing().userId == request.auth.uid && isValidLeaderboardEntry(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && isValidId(entryId) && existing().userId == request.auth.uid;
+    }
+
+    // Real-time Presence Active Sessions
+    match /active_sessions/{sessionId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isValidId(sessionId) && isValidActiveSession(incoming());
+      allow update: if isSignedIn() && isValidId(sessionId) && existing().userId == request.auth.uid && isValidActiveSession(incoming()) && incoming().userId == existing().userId;
+      allow delete: if isSignedIn() && isValidId(sessionId) && existing().userId == request.auth.uid;
+    }
+
+    // Real-time secure Chat Rooms
+    match /coop_chat/{messageId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && isValidId(messageId) && isValidChatMessage(incoming());
+      allow update, delete: if isSignedIn() && isValidId(messageId) && existing().userId == request.auth.uid;
+    }
+  }
+}

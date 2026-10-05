@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "UserSave": {
+      "title": "UserSave",
+      "description": "User profile and persistent tactical campaign save state",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the commander",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "callsign": {
+          "type": "string",
+          "description": "Commander callsign name",
+          "maxLength": 64
+        },
+        "email": {
+          "type": "string",
+          "description": "Commander email address",
+          "maxLength": 128
+        },
+        "cash": {
+          "type": "number",
+          "description": "Current War Chest balance in dollars"
+        },
+        "totalDevastationCash": {
+          "type": "number",
+          "description": "Cumulative destruction bounty earned"
+        },
+        "selectedAssetId": {
+          "type": "string",
+          "description": "Active strike weapon ID",
+          "maxLength": 64
+        },
+        "activeTheaterId": {
+          "type": "string",
+          "description": "Active combat theater ID",
+          "maxLength": 64
+        },
+        "unlockedWeapons": {
+          "type": "array",
+          "description": "List of unlocked weapon IDs"
+        },
+        "achievements": {
+          "type": "array",
+          "description": "Unlocked commander achievement medals"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last save"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when profile was created"
+        }
+      },
+      "required": ["userId", "cash", "totalDevastationCash", "updatedAt"]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Global commander devastation leaderboard ranking",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "commanderName": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "devastationScore": {
+          "type": "number"
+        },
+        "highestTheater": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "nuclearStrikes": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "userId", "commanderName", "devastationScore", "updatedAt"]
+    },
+    "ActiveSession": {
+      "title": "ActiveSession",
+      "description": "Real-time active presence session of a military commander in joint operations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "commanderName": { "type": "string", "maxLength": 64 },
+        "activeTheaterId": { "type": "string", "maxLength": 64 },
+        "x": { "type": "number" },
+        "z": { "type": "number" },
+        "altitude": { "type": "number" },
+        "rotationY": { "type": "number" },
+        "lastAction": { "type": "string", "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "commanderName", "activeTheaterId", "x", "z", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A real-time co-op chat message exchanged between online commanders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "commanderName": { "type": "string", "maxLength": 64 },
+        "activeTheaterId": { "type": "string", "maxLength": 64 },
+        "text": { "type": "string", "maxLength": 280 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "commanderName", "activeTheaterId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserSave",
+      "description": "Persistent campaign game save per authenticated user"
+    },
+    "/leaderboard/{entryId}": {
+      "schema": "LeaderboardEntry",
+      "description": "Public leaderboard entries for military commander rankings"
+    },
+    "/active_sessions/{sessionId}": {
+      "schema": "ActiveSession",
+      "description": "Real-time active presence sessions for Joint Operations co-op theater"
+    },
+    "/coop_chat/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Real-time secure chat logs for active Joint-Ops commanders"
+    }
+  }
+}
