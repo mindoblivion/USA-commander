@@ -1,7 +1,7 @@
 import { 
   CombatTheater, 
   GameSettings, 
-  PresidentialDirective, 
+  CommanderDirective, 
   StrikeAsset,
   VehicleCatalogItem,
   VehicleModelType,
@@ -130,7 +130,7 @@ export const INITIAL_STRIKE_ASSETS: StrikeAsset[] = [
     aircraftModel: 'orbital'
   },
   {
-    id: 'tactical_nuke',
+    id: 'thunder_bomb',
     name: 'Thunder Bomb',
     code: 'THUNDER-01',
     category: 'Strategic',
@@ -146,9 +146,9 @@ export const INITIAL_STRIKE_ASSETS: StrikeAsset[] = [
     upgradeCost: 6500000,
     unlocked: false,
     unlockRequirement: 'Commander Strike Authorization ($10M)',
-    iconName: 'radioactive',
-    aircraftModel: 'nuke',
-    isNuclear: true
+    iconName: 'thunder',
+    aircraftModel: 'thunder',
+    isThunder: true
   }
 ];
 
@@ -188,13 +188,13 @@ export const COMBAT_THEATERS: CombatTheater[] = [
     unlockCashRequired: 250000
   },
   {
-    id: 'pyongyang_network',
-    name: 'Vantor Island: Centrifuge Enrichment Vault',
+    id: 'vantor_vault',
+    name: 'Vantor Island: Reactor Forge Vault',
     codename: 'OP: DUST MATRIX',
     country: 'Iron Legion',
     region: 'Vantor Mountain Range',
     threatLevel: 'DEFCON 2',
-    description: 'Reinforced concrete air defense rings, long-range rotating radar towers, and deep sub-level nuclear centrifuge research chambers.',
+    description: 'Reinforced concrete air defense rings, long-range rotating radar towers, and deep sub-level Iron Legion reactor forge research chambers.',
     accentColor: '#ef4444',
     groundColor: '#78350f',
     fogColor: '#2d1a04',
@@ -223,8 +223,8 @@ export const COMBAT_THEATERS: CombatTheater[] = [
   },
   {
     id: 'cyber_island',
-    name: 'Caldera Island: Nuclear Power Plant',
-    codename: 'OP: ATOMIC FLUX',
+    name: 'Caldera Island: Iron Legion Reactor Forge',
+    codename: 'OP: FORGE FLUX',
     country: 'Iron Legion',
     region: 'Caldera Coastal Sector',
     threatLevel: 'DEFCON 1',
@@ -245,7 +245,7 @@ export const COMBAT_THEATERS: CombatTheater[] = [
     country: 'Iron Legion',
     region: 'Ironhold Rock Highlands',
     threatLevel: 'CRITICAL',
-    description: 'Ultra-hardened tactical ICBM launch silos hidden inside deep rock valleys and protected by massive iron surface shields.',
+    description: 'Ultra-hardened Iron Legion siege-rocket silos hidden inside deep rock valleys and protected by massive iron surface shields.',
     accentColor: '#f43f5e',
     groundColor: '#451a03',
     fogColor: '#1c0d02',
@@ -257,7 +257,7 @@ export const COMBAT_THEATERS: CombatTheater[] = [
   }
 ];
 
-export const INITIAL_PRESIDENTIAL_DIRECTIVES: PresidentialDirective[] = [
+export const INITIAL_COMMANDER_DIRECTIVES: CommanderDirective[] = [
   {
     id: 'dir_1',
     title: 'First Strike Protocol',
@@ -316,7 +316,7 @@ export const INITIAL_PRESIDENTIAL_DIRECTIVES: PresidentialDirective[] = [
     quote: "The launch key is right here on my console, and it actually works! Deploy the Thunder Bomb for total historic victory!",
     angryQuote: "Deploy the Thunder Bomb! What are you waiting for?! We didn't build the greatest arsenal in the world to sit around! Launch it!",
     targetDescription: 'Unlock and deploy the Thunder Bomb',
-    targetType: 'nuke',
+    targetType: 'thunder',
     targetAmount: 1,
     currentAmount: 0,
     cashBonus: 10000000,
@@ -333,8 +333,8 @@ export const DEFAULT_GAME_SETTINGS: GameSettings = {
   renderScale: 1.0,
   masterVolume: 0.8,
   sfxVolume: 0.85,
-  presidentialVoice: true,
-  presidentialVoiceVolume: 0.9,
+  commanderVoice: true,
+  commanderVoiceVolume: 0.9,
   radioChatter: true,
   haptics: true,
   overlays: {

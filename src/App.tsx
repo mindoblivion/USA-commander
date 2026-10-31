@@ -1,6 +1,6 @@
 /**
  * USA Commander: Tactical Strike 3D
- * Undercover Special Access Program // Black-Ops Vehicle Garage & Nuclear Command
+ * Undercover Special Access Program // Black-Ops Vehicle Garage & Thunder Command
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -10,7 +10,7 @@ import {
   DestructibleTarget,
   GameSettings,
   IntelDrop,
-  PresidentialDirective,
+  CommanderDirective,
   StrikeAsset,
   TacticalStrikeIndicator,
   VehicleModelType,
@@ -23,7 +23,7 @@ import {
   COMBAT_THEATERS,
   DEFAULT_GAME_SETTINGS,
   DEFAULT_VEHICLE_UPGRADES,
-  INITIAL_PRESIDENTIAL_DIRECTIVES,
+  INITIAL_COMMANDER_DIRECTIVES,
   INITIAL_STRIKE_ASSETS
 } from './data/gameDefaults';
 import { generateTheaterTargets } from './utils/theaterGenerator';
@@ -41,6 +41,13 @@ import { TacticalCombatOverlays } from './components/TacticalCombatOverlays';
 import { testConnection, auth, db } from './firebase/config';
 import { setDoc, doc, onSnapshot, collection, query, orderBy, limit } from 'firebase/firestore';
 import { saveCampaignToCloud, loadCampaignFromCloud, CommanderAchievement } from './firebase/firestoreService';
+import {
+  migrateMedals,
+  migrateSettings,
+  migrateStrikeAssets,
+  migrateTheaterId,
+  migrateTheaters
+} from './utils/saveMigration';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { AchievementsModal } from './components/AchievementsModal';
 import { Radio } from 'lucide-react';
@@ -59,7 +66,7 @@ export default function App() {
   const [theaters, setTheaters] = useState<CombatTheater[]>(COMBAT_THEATERS);
   const [activeTheaterId, setActiveTheaterId] = useState<string>('metropolis_alpha');
   const [targets, setTargets] = useState<DestructibleTarget[]>([]);
-  const [directives, setDirectives] = useState<PresidentialDirective[]>(INITIAL_PRESIDENTIAL_DIRECTIVES);
+  const [directives, setDirectives] = useState<CommanderDirective[]>(INITIAL_COMMANDER_DIRECTIVES);
   const [activeDirectiveIndex, setActiveDirectiveIndex] = useState<number>(0);
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(false);
@@ -100,7 +107,7 @@ export default function App() {
   const [intelDrops, setIntelDrops] = useState<IntelDrop[]>([]);
   const [strikeIndicators, setStrikeIndicators] = useState<TacticalStrikeIndicator[]>([]);
   const [compassAngle, setCompassAngle] = useState<number>(45);
-  const [nukeFlashActive, setNukeFlashActive] = useState<boolean>(false);
+  const [thunderFlashActive, setThunderFlashActive] = useState<boolean>(false);
   const [fps, setFps] = useState<number>(60);
   const [combatLogs, setCombatLogs] = useState<{ id: string; text: string; time: string }[]>([]);
   const [joystickVector, setJoystickVector] = useState<JoystickVector>({ x: 0, y: 0, isBoosting: false });
@@ -179,8 +186,9 @@ export default function App() {
           if (cloudData.cash !== undefined) setCash(cloudData.cash);
           if (cloudData.totalDevastationCash !== undefined)
             setTotalDevastationCash(cloudData.totalDevastationCash);
-          if (cloudData.activeTheaterId) setActiveTheaterId(cloudData.activeTheaterId);
-          if (cloudData.achievements) setUnlockedMedals(cloudData.achievements);
+          if (cloudData.activeTheaterId) setActiveTheaterId(migrateTheaterId(cloudData.activeTheaterId));
+          const cloudMedals = migrateMedals(cloudData.achievements);
+          if (cloudMedals) setUnlockedMedals(cloudMedals);
           addCombatLog('Restored campaign progress and medals from Firebase Cloud Save.');
         }
       }
@@ -198,15 +206,18 @@ export default function App() {
         if (parsed.cash !== undefined) setCash(parsed.cash);
         if (parsed.totalDevastationCash !== undefined)
           setTotalDevastationCash(parsed.totalDevastationCash);
-        if (parsed.strikeAssets) setStrikeAssets(parsed.strikeAssets);
-        if (parsed.theaters) setTheaters(parsed.theaters);
-        if (parsed.activeTheaterId) setActiveTheaterId(parsed.activeTheaterId);
-        if (parsed.unlockedMedals) setUnlockedMedals(parsed.unlockedMedals);
+        const savedAssets = migrateStrikeAssets(parsed.strikeAssets);
+        if (savedAssets) setStrikeAssets(savedAssets);
+        const savedTheaters = migrateTheaters(parsed.theaters);
+        if (savedTheaters) setTheaters(savedTheaters);
+        if (parsed.activeTheaterId) setActiveTheaterId(migrateTheaterId(parsed.activeTheaterId));
+        const savedMedals = migrateMedals(parsed.unlockedMedals);
+        if (savedMedals) setUnlockedMedals(savedMedals);
 
         // Safe merge settings so overlays is NEVER undefined
         const mergedSettings: GameSettings = {
           ...DEFAULT_GAME_SETTINGS,
-          ...(parsed.settings || {}),
+          ...migrateSettings<GameSettings>(parsed.settings),
           overlays: {
             ...DEFAULT_GAME_SETTINGS.overlays,
             ...(parsed.settings?.overlays || {})
@@ -398,10 +409,10 @@ export default function App() {
                     const newAmount = dir.currentAmount + 1;
                     const completed = newAmount >= dir.targetAmount;
                     if (completed && !dir.completed) {
-                      soundEngine.speakPresidentialOrder(
+                      soundEngine.speakCommanderOrder(
                         "Outstanding driving, General! Direct order completed. Claim your bounty!",
-                        settings.presidentialVoice,
-                        settings.presidentialVoiceVolume
+                        settings.commanderVoice,
+                        settings.commanderVoiceVolume
                       );
                     }
                     return { ...dir, currentAmount: newAmount, completed };
@@ -452,7 +463,7 @@ export default function App() {
         addCombatLog(`THEATER FULLY PACIFIED. Complete military victory in ${activeTheater.name}!`);
       }
     },
-    [activeDirectiveIndex, activeTheater.name, destructionPct, settings.overlays?.targetTelemetry, settings.presidentialVoice, settings.presidentialVoiceVolume, addCombatLog]
+    [activeDirectiveIndex, activeTheater.name, destructionPct, settings.overlays?.targetTelemetry, settings.commanderVoice, settings.commanderVoiceVolume, addCombatLog]
   );
 
   // LAUNCH AIRSTRIKE / BOMB DROP
@@ -468,14 +479,14 @@ export default function App() {
       );
 
       soundEngine.playJetFlyby();
-      if (activeAsset.isNuclear) {
-        soundEngine.playNuclearAlarm();
-        setNukeFlashActive(true);
-        setTimeout(() => setNukeFlashActive(false), 3500);
+      if (activeAsset.isThunder) {
+        soundEngine.playThunderAlarm();
+        setThunderFlashActive(true);
+        setTimeout(() => setThunderFlashActive(false), 3500);
       }
 
       setTimeout(() => {
-        soundEngine.playExplosion(activeAsset.isNuclear ? 2.5 : activeAsset.radius > 8 ? 1.5 : 1.0);
+        soundEngine.playExplosion(activeAsset.isThunder ? 2.5 : activeAsset.radius > 8 ? 1.5 : 1.0);
 
         let damageDealtTotal = 0;
         let bountyEarned = 0;
@@ -510,9 +521,9 @@ export default function App() {
               if (isKilled) {
                 bountyEarned += target.value;
 
-                const rarity: 'standard' | 'classified' | 'top_secret' | 'presidential' =
+                const rarity: 'standard' | 'classified' | 'top_secret' | 'commander' =
                   target.isBossTarget
-                    ? 'presidential'
+                    ? 'commander'
                     : target.value > 150000
                     ? 'top_secret'
                     : target.value > 50000
@@ -535,7 +546,7 @@ export default function App() {
                 if (settings.overlays?.autoScrapRecovery ?? true) {
                   setCash((c) => c + newIntel.value);
                   soundEngine.playLootChime(
-                    rarity === 'presidential'
+                    rarity === 'commander'
                       ? 'mythic'
                       : rarity === 'top_secret'
                       ? 'legendary'
@@ -553,16 +564,16 @@ export default function App() {
                     if (dir.targetType === 'radar' && (target.type === 'radar' || target.type === 'air_defense')) match = true;
                     if (dir.targetType === 'bunker' && target.type === 'bunker') match = true;
                     if (dir.targetType === 'refinery' && (target.type === 'refinery' || target.type === 'factory')) match = true;
-                    if (dir.targetType === 'nuke' && activeAsset.isNuclear) match = true;
+                    if (dir.targetType === 'thunder' && activeAsset.isThunder) match = true;
 
                     if (match) {
                       const newAmount = dir.currentAmount + 1;
                       const completed = newAmount >= dir.targetAmount;
                       if (completed && !dir.completed) {
-                        soundEngine.speakPresidentialOrder(
+                        soundEngine.speakCommanderOrder(
                           "Tremendous work, Commander! Direct order completed. Claim your HQ bounty!",
-                          settings.presidentialVoice,
-                          settings.presidentialVoiceVolume
+                          settings.commanderVoice,
+                          settings.commanderVoiceVolume
                         );
                       }
                       return { ...dir, currentAmount: newAmount, completed };
@@ -609,8 +620,8 @@ export default function App() {
           consecutiveHitsRef.current = 0;
         }
 
-        if (activeAsset.id === 'tactical_nuke' || activeAsset.id === 'moab_bomb') {
-          setTimeout(() => triggerUnlockMedal('nuclear_pioneer', 'Nuclear Pioneer', '☢️'), 300);
+        if (activeAsset.id === 'thunder_bomb' || activeAsset.id === 'moab_bomb') {
+          setTimeout(() => triggerUnlockMedal('thunder_pioneer', 'Thunder Pioneer', '⚡'), 300);
         }
 
         setTimeout(() => {
@@ -631,8 +642,8 @@ export default function App() {
       destructionPct,
       settings.overlays?.autoScrapRecovery,
       settings.overlays?.targetTelemetry,
-      settings.presidentialVoice,
-      settings.presidentialVoiceVolume,
+      settings.commanderVoice,
+      settings.commanderVoiceVolume,
       addCombatLog
     ]
   );
@@ -896,7 +907,7 @@ export default function App() {
     setStrikeAssets(INITIAL_STRIKE_ASSETS);
     setVehicleUpgrades(DEFAULT_VEHICLE_UPGRADES);
     setTheaters(COMBAT_THEATERS);
-    setDirectives(INITIAL_PRESIDENTIAL_DIRECTIVES);
+    setDirectives(INITIAL_COMMANDER_DIRECTIVES);
     setActiveTheaterId('metropolis_alpha');
     setTargets(generateTheaterTargets(COMBAT_THEATERS[0]));
     addCombatLog('War campaign progress has been reset to defaults.');
@@ -1007,7 +1018,7 @@ export default function App() {
           targets={targets}
           activeStrikeRadius={activeAsset.radius}
           strikeWeaponId={activeAsset.id}
-          isNuclearStrikeActive={!!activeAsset.isNuclear}
+          isThunderStrikeActive={!!activeAsset.isThunder}
           settings={settings}
           vehicleUpgrades={vehicleUpgrades}
           joystickVector={joystickVector}
@@ -1031,15 +1042,15 @@ export default function App() {
             directive={currentDirective}
             onClaimBonus={handleClaimDirectiveBonus}
             onPlaySpeech={(text) =>
-              soundEngine.speakPresidentialOrder(
+              soundEngine.speakCommanderOrder(
                 text,
-                settings.presidentialVoice,
-                settings.presidentialVoiceVolume
+                settings.commanderVoice,
+                settings.commanderVoiceVolume
               )
             }
-            voiceEnabled={settings.presidentialVoice}
+            voiceEnabled={settings.commanderVoice}
             onToggleVoice={() =>
-              setSettings((s) => ({ ...s, presidentialVoice: !s.presidentialVoice }))
+              setSettings((s) => ({ ...s, commanderVoice: !s.commanderVoice }))
             }
           />
         </div>
@@ -1048,7 +1059,7 @@ export default function App() {
         <TacticalCombatOverlays
           strikeIndicators={strikeIndicators}
           showStrikeIndicators={settings.overlays?.targetTelemetry ?? true}
-          nukeFlashActive={nukeFlashActive}
+          thunderFlashActive={thunderFlashActive}
           combatLogs={combatLogs}
         />
 

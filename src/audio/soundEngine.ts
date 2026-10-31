@@ -209,9 +209,9 @@ class SoundEngine {
   }
 
   /**
-   * Nuclear alarm siren / ICBM warhead launch
+   * Thunder Bomb alarm siren / reactor forge launch klaxon
    */
-  public playNuclearAlarm() {
+  public playThunderAlarm() {
     try {
       this.initContext();
       if (!this.ctx || !this.sfxGain) return;
@@ -275,7 +275,7 @@ class SoundEngine {
   /**
    * Direct Commander Voice Dispatch using Web Speech API
    */
-  public speakPresidentialOrder(text: string, enabled: boolean = true, volume: number = 0.9) {
+  public speakCommanderOrder(text: string, enabled: boolean = true, volume: number = 0.9) {
     if (!enabled || !('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel(); // Cancel any ongoing speech

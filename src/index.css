@@ -174,16 +174,16 @@
   animation: damageFloat 0.8s ease-out forwards;
 }
 
-/* Nuclear screen flash */
-@keyframes nukeFlash {
+/* Thunder Bomb screen flash */
+@keyframes thunderFlash {
   0% { opacity: 0; }
   10% { opacity: 0.95; }
   35% { opacity: 0.8; }
   100% { opacity: 0; }
 }
 
-.animate-nuke-flash {
-  animation: nukeFlash 3.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+.animate-thunder-flash {
+  animation: thunderFlash 3.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
 /* American Flag Wind Flap & Ripple Animations */

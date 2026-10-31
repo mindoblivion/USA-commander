@@ -485,13 +485,13 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                   const canAffordUpgrade = cash >= asset.upgradeCost;
                   const canAffordUnlock = cash >= asset.cost;
                   const isMaxLevel = asset.level >= asset.maxLevel;
-                  const isNuke = !!asset.isNuclear;
+                  const isThunderBlast = !!asset.isThunder;
 
                   return (
                     <div
                       key={asset.id}
                       className={`p-4 rounded-xl border flex flex-col justify-between transition-all ${
-                        isNuke
+                        isThunderBlast
                           ? 'bg-red-950/20 border-red-800/60 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
                           : asset.unlocked
                           ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
@@ -505,7 +505,7 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                               <span className="text-xs font-mono font-bold text-slate-400">{asset.code}</span>
                               <span
                                 className={`text-[10px] uppercase font-mono px-1.5 py-0.5 rounded ${
-                                  isNuke
+                                  isThunderBlast
                                     ? 'bg-red-950 text-red-400 border border-red-800'
                                     : 'bg-slate-800 text-slate-300'
                                 }`}

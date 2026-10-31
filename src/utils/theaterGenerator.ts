@@ -36,7 +36,7 @@ export function generateTheaterTargets(theater: CombatTheater): DestructibleTarg
   const targets: DestructibleTarget[] = [];
 
   const isDesert = theater.id === 'desert_shield';
-  const isAirDefense = theater.id === 'pyongyang_network';
+  const isAirDefense = theater.id === 'vantor_vault';
   const isNaval = theater.id === 'baltic_naval';
   const isCyber = theater.id === 'cyber_island';
   const isArctic = theater.id === 'arctic_silo';
@@ -213,7 +213,7 @@ export function generateTheaterTargets(theater: CombatTheater): DestructibleTarg
     } else if (isArctic) {
       if (i === cityPlots.length - 1) {
         type = 'silo';
-        name = 'PRIMARY ICBM LAUNCH SILO APEX';
+        name = 'PRIMARY REACTOR FORGE SIEGE-ROCKET SILO APEX';
         width = 8.8;
         height = 7.0;
         depth = 8.8;

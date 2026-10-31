@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Volume2, VolumeX, Award, ChevronUp, ChevronDown, CheckCircle2, AlertOctagon, Flame } from 'lucide-react';
-import { PresidentialDirective } from '../types/game';
+import { CommanderDirective } from '../types/game';
 
 const COMMANDER_PORTRAIT = '/art/commander_portrait.png';
 
 interface CommanderBriefingProps {
-  directive: PresidentialDirective;
+  directive: CommanderDirective;
   onClaimBonus: (directiveId: string) => void;
   onPlaySpeech: (text: string) => void;
   voiceEnabled: boolean;

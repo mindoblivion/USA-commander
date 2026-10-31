@@ -56,8 +56,8 @@ export interface StrikeAsset {
   unlocked: boolean;
   unlockRequirement: string;
   iconName: string;
-  aircraftModel: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'nuke';
-  isNuclear?: boolean;
+  aircraftModel: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'thunder';
+  isThunder?: boolean;
 }
 
 export type TargetCategory =
@@ -192,7 +192,7 @@ export interface IntelDrop {
   x: number;
   z: number;
   value: number;
-  rarity: 'standard' | 'classified' | 'top_secret' | 'presidential';
+  rarity: 'standard' | 'classified' | 'top_secret' | 'commander';
   title: string;
   collected: boolean;
   createdAt: number;
@@ -233,8 +233,8 @@ export interface GameSettings {
   renderScale: number; // 0.75 to 1.25
   masterVolume: number;
   sfxVolume: number;
-  presidentialVoice: boolean;
-  presidentialVoiceVolume: number;
+  commanderVoice: boolean;
+  commanderVoiceVolume: number;
   radioChatter: boolean;
   haptics: boolean;
   overlays: TacticalOverlaySettings;
@@ -247,13 +247,13 @@ export interface GameSettings {
   };
 }
 
-export interface PresidentialDirective {
+export interface CommanderDirective {
   id: string;
   title: string;
   quote: string;
   angryQuote?: string;
   targetDescription: string;
-  targetType: 'any' | 'radar' | 'bunker' | 'refinery' | 'total_damage' | 'nuke' | 'jeep_ram';
+  targetType: 'any' | 'radar' | 'bunker' | 'refinery' | 'total_damage' | 'thunder' | 'jeep_ram';
   targetAmount: number;
   currentAmount: number;
   cashBonus: number;
@@ -265,7 +265,7 @@ export interface PresidentialDirective {
 
 export interface ActiveAirstrikeFlyer {
   id: string;
-  model: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'nuke';
+  model: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'thunder';
   startX: number;
   startZ: number;
   targetX: number;

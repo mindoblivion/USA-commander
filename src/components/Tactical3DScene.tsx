@@ -25,7 +25,7 @@ interface Tactical3DSceneProps {
   targets: DestructibleTarget[];
   activeStrikeRadius: number;
   strikeWeaponId: string;
-  isNuclearStrikeActive: boolean;
+  isThunderStrikeActive: boolean;
   settings: GameSettings;
   vehicleUpgrades: VehicleUpgradeState;
   joystickVector?: { x: number; y: number; isBoosting?: boolean };
@@ -50,7 +50,7 @@ interface ExplosionInstance {
   light: THREE.PointLight;
   maxAge: number;
   age: number;
-  isNuke: boolean;
+  isThunderBlast: boolean;
 }
 
 interface AircraftInstance {
@@ -216,7 +216,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
   targets,
   activeStrikeRadius,
   strikeWeaponId,
-  isNuclearStrikeActive,
+  isThunderStrikeActive,
   settings,
   vehicleUpgrades,
   joystickVector,
@@ -992,20 +992,20 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
           scene.remove(exp.group);
           explosionsRef.current.splice(i, 1);
         } else {
-          const scale = 1 + progress * (exp.isNuke ? 32 : 12);
+          const scale = 1 + progress * (exp.isThunderBlast ? 32 : 12);
           exp.shockwave.scale.set(scale, scale, 1);
           (exp.shockwave.material as THREE.Material).opacity = Math.max(0, (1 - progress) * 0.9);
 
           const geo = exp.particles.geometry;
           const pos = geo.attributes.position;
           for (let p = 0; p < pos.count; p++) {
-            pos.setY(p, pos.getY(p) + delta * (exp.isNuke ? 16 : 7));
+            pos.setY(p, pos.getY(p) + delta * (exp.isThunderBlast ? 16 : 7));
             pos.setX(p, pos.getX(p) + (pos.getX(p) > 0 ? 1 : -1) * delta * 5);
             pos.setZ(p, pos.getZ(p) + (pos.getZ(p) > 0 ? 1 : -1) * delta * 5);
           }
           pos.needsUpdate = true;
           (exp.particles.material as THREE.PointsMaterial).opacity = Math.max(0, 1 - progress);
-          exp.light.intensity = (1 - progress) * (exp.isNuke ? 16 : 4);
+          exp.light.intensity = (1 - progress) * (exp.isThunderBlast ? 16 : 4);
         }
       }
 
@@ -2972,7 +2972,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     }
   };
 
-  const trigger3DExplosion = (x: number, z: number, radius: number, isNuke: boolean) => {
+  const trigger3DExplosion = (x: number, z: number, radius: number, isThunderBlast: boolean) => {
     if (!sceneRef.current) return;
     const scene = sceneRef.current;
     const group = new THREE.Group();
@@ -2980,7 +2980,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
 
     const shockGeo = new THREE.RingGeometry(0.2, radius, 36);
     const shockMat = new THREE.MeshBasicMaterial({
-      color: isNuke ? 0xffffff : 0xf97316,
+      color: isThunderBlast ? 0xffffff : 0xf97316,
       transparent: true,
       opacity: 0.9,
       side: THREE.DoubleSide,
@@ -2990,20 +2990,20 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     shockwave.rotation.x = -Math.PI / 2;
     group.add(shockwave);
 
-    const pCount = isNuke ? 350 : 120;
+    const pCount = isThunderBlast ? 350 : 120;
     const pGeo = new THREE.BufferGeometry();
     const pPos = new Float32Array(pCount * 3);
     for (let i = 0; i < pCount; i++) {
       const pAngle = Math.random() * Math.PI * 2;
       const pR = Math.random() * (radius * 0.7);
       pPos[i * 3] = Math.cos(pAngle) * pR;
-      pPos[i * 3 + 1] = Math.random() * (isNuke ? 12 : 4);
+      pPos[i * 3 + 1] = Math.random() * (isThunderBlast ? 12 : 4);
       pPos[i * 3 + 2] = Math.sin(pAngle) * pR;
     }
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
     const pMat = new THREE.PointsMaterial({
-      color: isNuke ? 0xfef08a : 0xf97316,
-      size: isNuke ? 1.8 : 0.9,
+      color: isThunderBlast ? 0xfef08a : 0xf97316,
+      size: isThunderBlast ? 1.8 : 0.9,
       transparent: true,
       opacity: 0.9,
       blending: THREE.AdditiveBlending
@@ -3011,7 +3011,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     const particles = new THREE.Points(pGeo, pMat);
     group.add(particles);
 
-    const light = new THREE.PointLight(isNuke ? 0xffffff : 0xf97316, isNuke ? 25 : 8, radius * 3.5);
+    const light = new THREE.PointLight(isThunderBlast ? 0xffffff : 0xf97316, isThunderBlast ? 25 : 8, radius * 3.5);
     light.position.y = 3;
     group.add(light);
 
@@ -3021,9 +3021,9 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
       particles,
       shockwave,
       light,
-      maxAge: isNuke ? 3.5 : 1.2,
+      maxAge: isThunderBlast ? 3.5 : 1.2,
       age: 0,
-      isNuke
+      isThunderBlast
     });
 
     // Spawn residual tactical fire pool that melts enemies
@@ -3052,7 +3052,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
       if (launcher.isDestroyed) return;
       const d = Math.hypot(launcher.x - x, launcher.z - z);
       if (d < radius + 3.0) {
-        const dmg = isNuke ? 350 : 150;
+        const dmg = isThunderBlast ? 350 : 150;
         launcher.hp -= dmg;
         if (launcher.hp <= 0) {
           launcher.isDestroyed = true;
@@ -3071,7 +3071,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
       const patrol = hostilePatrolsRef.current[i];
       const d = Math.hypot(patrol.x - x, patrol.z - z);
       if (d < radius + 2.5) {
-        const dmg = isNuke ? 300 : 130;
+        const dmg = isThunderBlast ? 300 : 130;
         patrol.hp -= dmg;
         if (patrol.hp <= 0) {
           scene.remove(patrol.mesh);
@@ -3087,7 +3087,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
   };
 
   const spawnAircraftFlyer = (
-    model: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'nuke',
+    model: 'f16' | 'f35' | 'ac130' | 'b2' | 'moab' | 'orbital' | 'thunder',
     targetX: number,
     targetZ: number,
     onBombImpact: () => void
@@ -3105,7 +3105,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     wings.position.set(0, 0, -0.4);
     craftGroup.add(wings);
 
-    const altitude = model === 'orbital' || model === 'nuke' ? 36 : 18;
+    const altitude = model === 'orbital' || model === 'thunder' ? 36 : 18;
     const startPos = new THREE.Vector3(targetX - 45, altitude, targetZ - 35);
     const endPos = new THREE.Vector3(targetX + 45, altitude, targetZ + 35);
 

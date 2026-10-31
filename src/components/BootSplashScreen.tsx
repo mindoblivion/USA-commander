@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import steelLegionBg from '../assets/images/steel_legion_title_bobble_1791062351382.jpg';
 import { CombatTheater, GameSettings, VehicleModelType } from '../types/game';
 import { soundEngine } from '../audio/soundEngine';
 
@@ -39,11 +38,11 @@ export const BootSplashScreen: React.FC<BootSplashScreenProps> = ({
       }}
       className="fixed inset-0 w-full h-[100dvh] flex flex-col justify-end items-center pb-6 bg-black overflow-hidden select-none cursor-pointer"
     >
-      {/* Fullscreen Title Picture with Big Bobblehead Trump */}
+      {/* Fullscreen Title Key Art */}
       <div className="absolute inset-0 z-0">
         <img
-          src={steelLegionBg}
-          alt="Steel Legion Joint Command Title Screen with Big Bobblehead Trump"
+          src="/art/title_key_art.png"
+          alt="USA Commander title key art: chibi strike team with tank, helicopter, jet and warship"
           className="w-full h-full object-fill object-center"
           referrerPolicy="no-referrer"
         />

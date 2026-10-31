@@ -4,21 +4,21 @@ import { TacticalStrikeIndicator } from '../types/game';
 interface TacticalCombatOverlaysProps {
   strikeIndicators: TacticalStrikeIndicator[];
   showStrikeIndicators: boolean;
-  nukeFlashActive: boolean;
+  thunderFlashActive: boolean;
   combatLogs: { id: string; text: string; time: string }[];
 }
 
 export const TacticalCombatOverlays: React.FC<TacticalCombatOverlaysProps> = ({
   strikeIndicators,
   showStrikeIndicators,
-  nukeFlashActive,
+  thunderFlashActive,
   combatLogs
 }) => {
   return (
     <div className="absolute inset-0 pointer-events-none z-30 overflow-hidden">
-      {/* Nuclear Flash Overlay */}
-      {nukeFlashActive && (
-        <div className="absolute inset-0 bg-white animate-nuke-flash pointer-events-none" />
+      {/* Thunder Flash Overlay */}
+      {thunderFlashActive && (
+        <div className="absolute inset-0 bg-white animate-thunder-flash pointer-events-none" />
       )}
 
       {/* Tactical Strike Impact Indicators */}

@@ -59,6 +59,8 @@ service cloud.firestore {
         && data.devastationScore is number
         && data.devastationScore >= 0
         && (!('highestTheater' in data) || (data.highestTheater is string && data.highestTheater.size() <= 64))
+        && (!('thunderStrikes' in data) || (data.thunderStrikes is number && data.thunderStrikes >= 0))
+        // legacy field from older clients, still accepted for backward compatibility
         && (!('nuclearStrikes' in data) || (data.nuclearStrikes is number && data.nuclearStrikes >= 0));
     }
 

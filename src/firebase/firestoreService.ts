@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import { db, auth, googleProvider } from './config';
+import { LEGACY_LEADERBOARD_STRIKES, migrateTheaterId } from '../utils/saveMigration';
 
 export enum OperationType {
   CREATE = 'create',
@@ -86,7 +87,7 @@ export interface LeaderboardItem {
   commanderName: string;
   devastationScore: number;
   highestTheater: string;
-  nuclearStrikes: number;
+  thunderStrikes: number;
   updatedAt: string;
 }
 
@@ -137,7 +138,7 @@ export async function saveCampaignToCloud(data: CloudSaveData): Promise<boolean>
       commanderName: data.callsign || user.displayName || 'US Commander',
       devastationScore: data.totalDevastationCash,
       highestTheater: data.activeTheaterId || 'metropolis_alpha',
-      nuclearStrikes: data.unlockedWeapons?.includes('tactical_nuke') ? 1 : 0,
+      thunderStrikes: data.unlockedWeapons?.includes('thunder_bomb') ? 1 : 0,
       updatedAt: new Date().toISOString()
     }, { merge: true });
 
@@ -173,7 +174,15 @@ export async function fetchGlobalLeaderboard(): Promise<LeaderboardItem[]> {
   try {
     const q = query(collection(db, 'leaderboard'), orderBy('devastationScore', 'desc'), limit(10));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => d.data() as LeaderboardItem);
+    return snapshot.docs.map((d) => {
+      const raw = d.data() as LeaderboardItem & Record<string, unknown>;
+      const legacyStrikes = Number(raw[LEGACY_LEADERBOARD_STRIKES] ?? 0);
+      return {
+        ...raw,
+        highestTheater: raw.highestTheater ? migrateTheaterId(raw.highestTheater) : raw.highestTheater,
+        thunderStrikes: raw.thunderStrikes ?? (Number.isFinite(legacyStrikes) ? legacyStrikes : 0)
+      } as LeaderboardItem;
+    });
   } catch (error) {
     // If empty or index building, return safe fallback
     console.warn('Leaderboard fetch note:', error);

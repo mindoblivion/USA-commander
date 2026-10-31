@@ -283,7 +283,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-tactical font-bold text-slate-200">Post-Processing Bloom</div>
-                    <div className="text-[10px] text-slate-400">Explosion glow and nuclear flash bloom</div>
+                    <div className="text-[10px] text-slate-400">Explosion glow and thunder flash bloom</div>
                   </div>
                   <input
                     type="checkbox"
@@ -348,7 +348,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     Commander Directives Voiceover
                   </label>
                   <span className="text-xs font-mono text-amber-400">
-                    {Math.round(settings.presidentialVoiceVolume * 100)}%
+                    {Math.round(settings.commanderVoiceVolume * 100)}%
                   </span>
                 </div>
                 <input
@@ -356,9 +356,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   min="0"
                   max="1"
                   step="0.05"
-                  value={settings.presidentialVoiceVolume}
+                  value={settings.commanderVoiceVolume}
                   onChange={(e) =>
-                    onUpdateSettings({ presidentialVoiceVolume: parseFloat(e.target.value) })
+                    onUpdateSettings({ commanderVoiceVolume: parseFloat(e.target.value) })
                   }
                   className="w-full accent-amber-500 cursor-pointer"
                 />
@@ -369,12 +369,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-tactical font-bold text-slate-200">Commander Audio Voice</div>
-                    <div className="text-[10px] text-slate-400">Synthesize verbal orders from Trump</div>
+                    <div className="text-[10px] text-slate-400">Synthesize verbal orders from the Commander</div>
                   </div>
                   <input
                     type="checkbox"
-                    checked={settings.presidentialVoice}
-                    onChange={(e) => onUpdateSettings({ presidentialVoice: e.target.checked })}
+                    checked={settings.commanderVoice}
+                    onChange={(e) => onUpdateSettings({ commanderVoice: e.target.checked })}
                     className="w-5 h-5 accent-amber-500 rounded cursor-pointer"
                   />
                 </div>
@@ -586,7 +586,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             {entry.commanderName || 'Anonymous Commander'}
                           </div>
                           <div className="text-[10px] text-slate-500">
-                            {entry.highestTheater || 'metropolis_alpha'} · {entry.nuclearStrikes ? '☢️ Nuclear Certified' : 'Conventional'}
+                            {entry.highestTheater || 'metropolis_alpha'} · {entry.thunderStrikes ? '⚡ Thunder Certified' : 'Conventional'}
                           </div>
                         </div>
                       </div>

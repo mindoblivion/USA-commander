@@ -83,7 +83,7 @@
           "type": "string",
           "maxLength": 64
         },
-        "nuclearStrikes": {
+        "thunderStrikes": {
           "type": "number"
         },
         "updatedAt": {

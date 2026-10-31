@@ -23,7 +23,7 @@ export const StrikeArsenalBar: React.FC<StrikeArsenalBarProps> = ({
       case 'shield-alert': return <ShieldAlert className="w-5 h-5" />;
       case 'flame': return <Flame className="w-5 h-5" />;
       case 'satellite': return <Globe className="w-5 h-5" />;
-      case 'radioactive': return <Radio className="w-5 h-5" />;
+      case 'thunder': return <Radio className="w-5 h-5" />;
       default: return <Target className="w-5 h-5" />;
     }
   };
@@ -35,7 +35,7 @@ export const StrikeArsenalBar: React.FC<StrikeArsenalBarProps> = ({
           {assets.map((asset, index) => {
             const isSelected = selectedAssetId === asset.id;
             const isOnCooldown = asset.currentCooldown > 0;
-            const isNuke = !!asset.isNuclear;
+            const isThunderBlast = !!asset.isThunder;
 
             return (
               <button
@@ -51,7 +51,7 @@ export const StrikeArsenalBar: React.FC<StrikeArsenalBarProps> = ({
                 className={`relative group flex flex-col items-center p-2 rounded-xl border transition-all duration-200 min-w-[76px] sm:min-w-[94px] cursor-pointer ${
                   !asset.unlocked
                     ? 'bg-slate-900/50 border-slate-800 opacity-60 hover:opacity-90'
-                    : isNuke
+                    : isThunderBlast
                     ? isSelected
                       ? 'bg-red-950/80 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)] scale-105'
                       : 'bg-red-950/30 border-red-800/60 hover:border-red-500/60'
@@ -78,7 +78,7 @@ export const StrikeArsenalBar: React.FC<StrikeArsenalBarProps> = ({
 
                 {/* Icon with glowing aura */}
                 <div className={`mt-2 mb-1 p-1.5 rounded-lg transition-transform ${
-                  isNuke
+                  isThunderBlast
                     ? 'text-red-400 group-hover:scale-110'
                     : isSelected
                     ? 'text-sky-300 scale-110'

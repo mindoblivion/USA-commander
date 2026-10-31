@@ -29,11 +29,11 @@ export const ACHIEVEMENTS_LIST: AchievementDefinition[] = [
     category: 'WEAPON SYSTEMS'
   },
   {
-    id: 'nuclear_pioneer',
-    title: 'Nuclear Pioneer',
+    id: 'thunder_pioneer',
+    title: 'Thunder Pioneer',
     description: 'Successfully construct and deploy a GBU-43/B MOAB or Thunder Bomb.',
-    medalIcon: '☢️',
-    requirementDescription: 'Detonate a heavy thermonuclear asset',
+    medalIcon: '⚡',
+    requirementDescription: 'Detonate a heavy reactor-forge thunder-charge asset',
     category: 'SPECIAL OPERATIONS'
   },
   {
