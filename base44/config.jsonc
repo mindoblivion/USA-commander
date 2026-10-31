@@ -1,0 +1,17 @@
+// Base44 Project Configuration
+// The "name" must match the Base44 app name exactly for GitHub repo linking.
+// Docs: https://docs.base44.com/developers/backend/overview/project-structure
+{
+  "name": "USA Commander",
+  "description": "Cartoon anime-style 3D tactical strike mobile game (React + Vite + Three.js)",
+
+  "visibility": "public",
+
+  // Site/hosting configuration for the Vite client
+  "site": {
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "serveCommand": "npm run dev",
+    "outputDirectory": "./dist"
+  }
+}
