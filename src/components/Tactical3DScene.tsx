@@ -20,6 +20,10 @@ import { Shield, Zap, Car, Eye, Compass, Gauge, Flame, Crosshair, CloudRain, Rad
 import { db, auth } from '../firebase/config';
 import { setDoc, doc, onSnapshot, deleteDoc, collection } from 'firebase/firestore';
 
+/** True on phones/tablets (no hover-capable pointer), where GPU headroom is scarce. */
+const isTouchFirstDevice = () =>
+  typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches;
+
 interface Tactical3DSceneProps {
   theater: CombatTheater;
   targets: DestructibleTarget[];
@@ -501,7 +505,12 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
       powerPreference: 'high-performance'
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, settings.graphicsQuality === 'ultra' ? 2 : 1.5));
+    // Touch devices render ~30% fewer pixels; that is the single biggest win for
+    // mobile frame rate and barely visible on a phone-sized screen.
+    const touchGpu = isTouchFirstDevice();
+    renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio, settings.graphicsQuality === 'ultra' ? 2 : touchGpu ? 1.25 : 1.5)
+    );
     renderer.shadowMap.enabled = settings.shadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     rendererRef.current = renderer;
@@ -518,8 +527,11 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     const sunLight = new THREE.DirectionalLight(0xfffaed, 1.5);
     sunLight.position.set(45, 65, 35);
     sunLight.castShadow = settings.shadows;
-    sunLight.shadow.mapSize.width = settings.graphicsQuality === 'low' ? 1024 : 2048;
-    sunLight.shadow.mapSize.height = settings.graphicsQuality === 'low' ? 1024 : 2048;
+    // Half-resolution shadow maps on mobile: soft shadows stay readable but the
+    // per-frame shadow pass is roughly 4x cheaper.
+    const shadowMapSize = settings.graphicsQuality === 'low' || touchGpu ? 1024 : 2048;
+    sunLight.shadow.mapSize.width = shadowMapSize;
+    sunLight.shadow.mapSize.height = shadowMapSize;
     sunLight.shadow.camera.near = 10;
     sunLight.shadow.camera.far = 160;
     const shadowD = 55;
@@ -3137,10 +3149,40 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
     }, 550);
   };
 
+  // Moves the ground reticle to a screen position. Needed by both drag and
+  // touch taps: a tap on a touchscreen emits no pointermove, so without this
+  // the reticle (and every strike aimed from it) stayed at its old position.
+  const updateReticleFromClient = useCallback((clientX: number, clientY: number) => {
+    if (!containerRef.current || !cameraRef.current || !groundPlaneRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = ((clientX - rect.left) / rect.width) * 2 - 1;
+    const mouseY = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycasterRef.current.setFromCamera(new THREE.Vector2(mouseX, mouseY), cameraRef.current);
+    const intersects = raycasterRef.current.intersectObject(groundPlaneRef.current);
+
+    if (intersects.length > 0 && reticleRef.current) {
+      const pt = intersects[0].point;
+      reticleRef.current.position.set(pt.x, 0.05, pt.z);
+
+      if (onReticleMove) {
+        onReticleMove(pt.x, pt.z);
+      }
+
+      const hovered = targets.find(
+        (t) => !t.isDestroyed && Math.hypot(t.x - pt.x, t.z - pt.z) < Math.max(t.width, t.depth) / 2 + 1
+      );
+      setHoveredTarget(hovered || null);
+    }
+  }, [targets, onReticleMove]);
+
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (e.button === 0) {
       isDraggingRef.current = true;
       previousPointerPosRef.current = { x: e.clientX, y: e.clientY };
+    }
+    if (e.pointerType !== 'mouse') {
+      updateReticleFromClient(e.clientX, e.clientY);
     }
   };
 
@@ -3159,27 +3201,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
       return;
     }
 
-    if (!containerRef.current || !cameraRef.current || !groundPlaneRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-    raycasterRef.current.setFromCamera(new THREE.Vector2(mouseX, mouseY), cameraRef.current);
-    const intersects = raycasterRef.current.intersectObject(groundPlaneRef.current);
-
-    if (intersects.length > 0 && reticleRef.current) {
-      const pt = intersects[0].point;
-      reticleRef.current.position.set(pt.x, 0.05, pt.z);
-
-      if (onReticleMove) {
-        onReticleMove(pt.x, pt.z);
-      }
-
-      const hovered = targets.find(
-        (t) => !t.isDestroyed && Math.hypot(t.x - pt.x, t.z - pt.z) < Math.max(t.width, t.depth) / 2 + 1
-      );
-      setHoveredTarget(hovered || null);
-    }
+    updateReticleFromClient(e.clientX, e.clientY);
   };
 
   const handlePointerUp = () => {
@@ -3238,7 +3260,9 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
         onPointerUp={handlePointerUp}
         onClick={handleCanvasClick}
         className={`w-full h-full block cursor-crosshair touch-none transition-all ${
-          settings.postProcessing !== false
+          // A full-screen CSS filter over a WebGL canvas re-composites every
+          // frame and tanks mobile frame rates, so phones skip the glow.
+          settings.postProcessing !== false && !isTouchFirstDevice()
             ? 'filter drop-shadow-[0_0_15px_rgba(245,158,11,0.2)] contrast-[108%] brightness-[104%]'
             : ''
         }`}
@@ -3266,7 +3290,7 @@ export const Tactical3DScene: React.FC<Tactical3DSceneProps> = ({
 
       {/* Target Diagnostic Tooltip */}
       {(settings.overlays?.targetHealthBars ?? true) && hoveredTarget && (
-        <div className="fixed top-16 right-4 pointer-events-none z-30 bg-slate-950/90 border border-slate-700/80 rounded-xl p-3 shadow-xl backdrop-blur-md max-w-xs animate-fade-in font-mono text-xs">
+        <div className="fixed top-[6.75rem] sm:top-16 right-3 sm:right-4 pointer-events-none z-30 bg-slate-950/90 border border-slate-700/80 rounded-xl p-3 shadow-xl backdrop-blur-md max-w-[85vw] sm:max-w-xs animate-fade-in font-mono text-xs">
           <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-1.5 mb-1.5">
             <span className="font-bold text-amber-400">{hoveredTarget.name}</span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">

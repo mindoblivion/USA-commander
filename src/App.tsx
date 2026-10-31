@@ -1036,8 +1036,9 @@ export default function App() {
           onReticleMove={(x, z) => setReticlePos({ x, z })}
         />
 
-        {/* FIXED FLOATING COMMANDER BRIEFING DRAWER */}
-        <div className="fixed top-14 left-3 sm:left-4 z-30 max-w-[290px] sm:max-w-sm w-full pointer-events-auto">
+        {/* FLOATING HUD COLUMN: commander briefing → comms toggle → comms panel */}
+        <div className="fixed hud-left hud-panel-top z-30 flex w-[calc(100%-1.5rem)] max-w-[290px] sm:max-w-sm flex-col items-start gap-2 pointer-events-none">
+        <div className="w-full pointer-events-auto">
           <CommanderBriefing
             directive={currentDirective}
             onClaimBonus={handleClaimDirectiveBonus}
@@ -1069,7 +1070,7 @@ export default function App() {
             setChatOpen((prev) => !prev);
             soundEngine.playRadioClick();
           }}
-          className="fixed left-3 sm:left-4 top-[240px] z-30 w-11 h-11 sm:w-12 sm:h-11 rounded-xl bg-slate-950/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 hover:bg-slate-900/90 shadow-[0_0_15px_rgba(6,182,212,0.15)] backdrop-blur-md flex items-center justify-center cursor-pointer transition-all active:scale-95 pointer-events-auto"
+          className="w-11 h-11 sm:w-12 sm:h-11 rounded-xl bg-slate-950/80 border border-cyan-500/40 hover:border-cyan-400 text-cyan-400 hover:bg-slate-900/90 shadow-[0_0_15px_rgba(6,182,212,0.15)] backdrop-blur-md flex items-center justify-center cursor-pointer transition-all active:scale-95 pointer-events-auto"
           title="Open NATO Tactical Trans-Comms Chat"
         >
           <div className="relative">
@@ -1080,7 +1081,7 @@ export default function App() {
 
         {/* NATO CHAT SLIDING PANEL */}
         {chatOpen && (
-          <div className="fixed left-3 sm:left-4 top-[305px] z-30 max-w-[290px] sm:max-w-sm w-full bg-slate-950/90 border border-slate-700/80 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden max-h-[360px] animate-fade-in pointer-events-auto">
+          <div className="w-full bg-slate-950/90 border border-slate-700/80 rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden max-h-[min(360px,45dvh)] animate-fade-in pointer-events-auto">
             {/* Header */}
             <div className="bg-slate-900/90 px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
@@ -1098,7 +1099,7 @@ export default function App() {
             </div>
 
             {/* Messages Feed */}
-            <div className="flex-1 p-3 overflow-y-auto space-y-2.5 max-h-[240px] font-mono text-[10px]">
+            <div className="flex-1 p-3 overflow-y-auto hud-scroll space-y-2.5 max-h-[240px] font-mono text-[10px]">
               {coopMessages.length === 0 ? (
                 <div className="text-center text-slate-600 py-6 italic">
                   No active comms. Awaiting coordinates transmission...
@@ -1139,6 +1140,7 @@ export default function App() {
             </form>
           </div>
         )}
+        </div>
 
         {/* ON-SCREEN VIRTUAL JOYSTICK (BOTTOM-LEFT) & ACTION BUTTONS (BOTTOM-RIGHT) */}
         <VirtualJoystick

@@ -92,7 +92,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-slate-950 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-4xl max-h-[90dvh] bg-slate-950 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
@@ -152,7 +152,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
         </div>
 
         {/* Medals Grid list */}
-        <div className="p-6 overflow-y-auto max-h-[55vh] space-y-4">
+        <div className="p-4 sm:p-6 overflow-y-auto hud-scroll max-h-[55dvh] space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {ACHIEVEMENTS_LIST.map((ach) => {
               const matchedMedal = unlockedMedals.find((m) => m.id === ach.id);

@@ -62,16 +62,19 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
   isAerialVehicle
 }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800/90 px-3 sm:px-6 py-2.5 flex items-center justify-between shadow-2xl pointer-events-auto select-none">
+    <header className="fixed top-0 left-0 right-0 z-40 hud-safe-top bg-slate-950/95 backdrop-blur-xl border-b border-slate-800/90 px-2.5 sm:px-6 py-1.5 sm:py-2.5 shadow-2xl pointer-events-auto select-none">
+      {/* Phone: two rows (brand+meters / controls). sm+: one row. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 sm:flex-nowrap sm:justify-between sm:gap-3">
       {/* Zone 1: Wordmark & Classified Clearance */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none sm:gap-3">
         <a
           href="#home"
           onClick={(e) => { e.preventDefault(); }}
-          className="text-sm sm:text-base font-display font-black tracking-tight text-white flex items-center gap-1.5 shrink-0"
+          className="text-[13px] sm:text-base font-display font-black tracking-tight text-white flex items-center gap-1.5 min-w-0"
         >
           <span className="text-red-500 font-black">USA</span>
-          <span>COMMANDER</span>
+          {/* Full wordmark from tablet up; phones keep the header compact */}
+          <span className="hidden sm:inline">COMMANDER</span>
         </a>
 
         {/* Classified Clearance Tag */}
@@ -82,26 +85,26 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
         {/* Current Active Theater Button */}
         <button
           onClick={onOpenTheaters}
-          className="hidden sm:flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-300 text-xs font-tactical font-semibold transition-colors cursor-pointer shrink-0"
+          className="flex h-10 w-10 sm:h-auto sm:w-auto items-center justify-center gap-1.5 py-1 px-1 sm:px-2.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 text-slate-300 text-xs font-tactical font-semibold transition-colors cursor-pointer shrink-0"
           title="Switch Combat Theater"
         >
-          <Globe className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-          <span className="truncate max-w-[130px]">{theater.codename}</span>
+          <Globe className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-sky-400 shrink-0" />
+          <span className="hidden sm:inline truncate max-w-[130px]">{theater.codename}</span>
         </button>
 
         {/* Tactical Weather Toggle */}
         <button
           onClick={onCycleWeather}
-          className="hidden lg:flex items-center gap-1.5 py-1 px-2 rounded-lg bg-slate-900/90 border border-slate-700 text-slate-300 hover:text-amber-300 text-xs font-mono transition-colors cursor-pointer"
+          className="flex h-10 w-10 lg:h-auto lg:w-auto shrink-0 items-center justify-center gap-1.5 py-1 px-1 lg:px-2 rounded-lg bg-slate-900/90 border border-slate-700 text-slate-300 hover:text-amber-300 text-xs font-mono transition-colors cursor-pointer"
           title="Cycle Tactical Weather Conditions"
         >
-          <CloudRain className="w-3.5 h-3.5 text-sky-400" />
-          <span className="uppercase text-[10px] font-bold">{weather.replace('_', ' ')}</span>
+          <CloudRain className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-sky-400" />
+          <span className="hidden lg:inline uppercase text-[10px] font-bold">{weather.replace('_', ' ')}</span>
         </button>
       </div>
 
       {/* Zone 2: Destruction Meter & War Chest */}
-      <div className="flex items-center gap-2 sm:gap-5 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-5 shrink-0 ml-auto sm:ml-0">
         {/* City Destruction Metric */}
         <div className="flex items-center gap-2">
           <div className="text-right hidden sm:block">
@@ -113,7 +116,7 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
             </div>
           </div>
 
-          <div className="w-14 sm:w-24 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800 shrink-0">
+          <div className="w-10 sm:w-24 h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800 shrink-0">
             <div
               className="h-full bg-gradient-to-r from-amber-500 to-red-500 transition-all duration-300"
               style={{ width: `${Math.min(100, destructionPct)}%` }}
@@ -134,11 +137,11 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
       </div>
 
       {/* Zone 3: Vision Modes, Flight Pilot & Actions */}
-      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+      <div className="flex w-full flex-wrap items-center justify-between gap-1.5 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-2.5 shrink-0">
         {/* NVG / FLIR Vision Mode Switch */}
         <button
           onClick={onToggleVisionMode}
-          className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer ${
+          className={`flex h-10 min-w-10 sm:h-auto sm:min-w-0 items-center justify-center gap-1 px-2 py-1 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer ${
             visionMode === 'nvg'
               ? 'bg-emerald-950 border-emerald-500 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.4)]'
               : visionMode === 'flir_thermal'
@@ -157,22 +160,22 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
         {isAerialVehicle && (
           <button
             onClick={onToggleFlightMode}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer ${
+            className={`flex h-10 min-w-10 sm:h-auto sm:min-w-0 items-center justify-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-mono font-bold transition-all cursor-pointer ${
               isFlightMode
                 ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.5)] animate-pulse'
                 : 'bg-amber-950/80 border-amber-500/60 text-amber-300 hover:bg-amber-900/80'
             }`}
             title="Toggle Direct Pilot / Gunner Controls"
           >
-            <Plane className="w-3.5 h-3.5" />
-            <span className="uppercase text-[10px]">{isFlightMode ? 'PILOT ACTIVE' : 'TAKEOFF'}</span>
+            <Plane className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline uppercase text-[10px]">{isFlightMode ? 'PILOT ACTIVE' : 'TAKEOFF'}</span>
           </button>
         )}
 
         {/* Vehicle Arsenal & Upgrades Store Catalog Button */}
         <button
           onClick={onOpenHangar}
-          className="flex items-center gap-1.5 py-1 px-2 sm:px-2.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/60 text-red-300 text-xs font-tactical font-bold transition-all cursor-pointer shadow-[0_0_12px_rgba(239,68,68,0.25)]"
+          className="flex h-10 min-w-10 sm:h-auto sm:min-w-0 items-center justify-center gap-1.5 py-1 px-2 sm:px-2.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/60 text-red-300 text-xs font-tactical font-bold transition-all cursor-pointer shadow-[0_0_12px_rgba(239,68,68,0.25)]"
           title="Vehicle Garage & Blueprint Crafting Lab"
         >
           <Car className="w-3.5 h-3.5" />
@@ -183,7 +186,7 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
         <button
           onClick={onResetCompass}
           title="Reset Camera Azimuth (Face North)"
-          className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900 border border-slate-700 hover:border-amber-400 flex items-center justify-center transition-all cursor-pointer group shadow"
+          className="relative w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-slate-900 border border-slate-700 hover:border-amber-400 flex items-center justify-center transition-all cursor-pointer group shadow shrink-0"
         >
           <div
             className="transition-transform duration-150"
@@ -197,20 +200,21 @@ export const TacticalTopBar: React.FC<TacticalTopBarProps> = ({
         {/* Mute Button */}
         <button
           onClick={onToggleMute}
-          className="p-1.5 sm:p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+          className="flex h-10 w-10 sm:h-auto sm:w-auto items-center justify-center p-1.5 sm:p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
           title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
         >
-          {isMuted ? <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+          {isMuted ? <VolumeX className="w-4 h-4 sm:w-4 sm:h-4" /> : <Volume2 className="w-4 h-4 sm:w-4 sm:h-4" />}
         </button>
 
         {/* Settings Cog Button */}
         <button
           onClick={onOpenSettings}
-          className="p-1.5 sm:p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
+          className="flex h-10 w-10 sm:h-auto sm:w-auto items-center justify-center p-1.5 sm:p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer"
           title="Video Quality & System Settings"
         >
-          <Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4 hover:rotate-45 transition-transform" />
+          <Settings className="w-4 h-4 sm:w-4 sm:h-4 hover:rotate-45 transition-transform" />
         </button>
+      </div>
       </div>
     </header>
   );

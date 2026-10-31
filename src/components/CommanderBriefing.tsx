@@ -21,7 +21,11 @@ export const CommanderBriefing: React.FC<CommanderBriefingProps> = ({
   onToggleVoice,
   isUnderperforming = false
 }) => {
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  // Phones start collapsed so the briefing never covers the play field;
+  // tablets/desktops keep it open exactly as before.
+  const [isExpanded, setIsExpanded] = useState<boolean>(
+    () => typeof window === 'undefined' || window.innerWidth >= 640
+  );
   const [forcedAngry, setForcedAngry] = useState<boolean>(false);
 
   const isAngry = isUnderperforming || forcedAngry || !!directive.failed;
@@ -65,24 +69,25 @@ export const CommanderBriefing: React.FC<CommanderBriefingProps> = ({
           <button
             onClick={() => onPlaySpeech(currentSpeech)}
             title="Listen to Commander order"
-            className={`p-1 rounded transition-colors cursor-pointer ${
+            className={`p-2 sm:p-1 rounded transition-colors cursor-pointer ${
               isAngry ? 'hover:bg-red-500/20 text-red-300' : 'hover:bg-amber-500/20 text-amber-300'
             }`}
           >
-            <Volume2 className="w-3.5 h-3.5" />
+            <Volume2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           </button>
           <button
             onClick={onToggleVoice}
             title={voiceEnabled ? 'Mute commander voiceover' : 'Enable commander voiceover'}
-            className="p-1 hover:bg-slate-800 text-slate-400 hover:text-amber-300 rounded transition-colors cursor-pointer"
+            className="p-2 sm:p-1 hover:bg-slate-800 text-slate-400 hover:text-amber-300 rounded transition-colors cursor-pointer"
           >
-            {voiceEnabled ? <Volume2 className="w-3.5 h-3.5 text-amber-400" /> : <VolumeX className="w-3.5 h-3.5" />}
+            {voiceEnabled ? <Volume2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-amber-400" /> : <VolumeX className="w-4 h-4 sm:w-3.5 sm:h-3.5" />}
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 hover:bg-slate-800 text-slate-400 hover:text-amber-300 rounded transition-colors ml-1 cursor-pointer"
+            title={isExpanded ? 'Collapse briefing' : 'Expand briefing'}
+            className="p-2 sm:p-1 hover:bg-slate-800 text-slate-400 hover:text-amber-300 rounded transition-colors ml-1 cursor-pointer"
           >
-            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {isExpanded ? <ChevronUp className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> : <ChevronDown className="w-4 h-4 sm:w-3.5 sm:h-3.5" />}
           </button>
         </div>
       </div>
@@ -92,7 +97,7 @@ export const CommanderBriefing: React.FC<CommanderBriefingProps> = ({
         <div className="p-3 flex items-start gap-3">
           {/* Dynamic Commander Avatar */}
           <div className="relative shrink-0 group">
-            <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-2xl bg-slate-900 transition-all animate-bobble ${
+            <div className={`w-16 h-16 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-2xl bg-slate-900 transition-all animate-bobble ${
               isAngry
                 ? 'border-4 border-red-500 ring-4 ring-red-500/60 shadow-[0_0_35px_rgba(239,68,68,0.8)]'
                 : 'border-4 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.6)]'
@@ -120,10 +125,10 @@ export const CommanderBriefing: React.FC<CommanderBriefingProps> = ({
                   onPlaySpeech("Total disaster! What are you doing?! You're under-performing, Commander! Step on the gas, crush those structures, or you are FIRED!");
                 }
               }}
-              className="absolute -top-1.5 -left-1.5 p-0.5 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-red-400 text-[8px] opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              className="absolute -top-2 -left-2 p-1.5 sm:p-0.5 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-red-400 text-[8px] opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
               title="Toggle Commander Angry / Normal Reaction"
             >
-              <AlertOctagon className="w-2.5 h-2.5" />
+              <AlertOctagon className="w-3 h-3 sm:w-2.5 sm:h-2.5" />
             </button>
           </div>
 

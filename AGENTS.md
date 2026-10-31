@@ -35,3 +35,25 @@ curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3000/   # expect 200
 - The preview proxy host is allowed via the bare
   `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` env var (Vite >= 6.1), so no Vite
   config change is needed in the sandbox.
+
+## Mobile layout conventions (HUD)
+- The whole game is a fixed, non-scrolling HUD over a full-bleed canvas. Phone
+  layout is Tailwind's `<sm` (below 640px); the header wraps into two rows there
+  (brand + meters, then a full-width row of 40px icon controls). Every header
+  control must stay on screen at 320px.
+- Anchor corner HUD pieces with the utilities in `src/index.css` instead of raw
+  offsets, so notches/home indicators are respected: `.hud-safe-top`,
+  `.hud-left`, `.hud-right`, `.hud-bottom`, `.hud-panel-top` (top-left column
+  under the header), `.hud-scroll` (vertical touch scrolling), plus
+  `.hud-joystick` / `.hud-actions` which shrink in landscape (`max-height:
+  480px`).
+- `html, body, #root` use `touch-action: manipulation`, deliberately not `none`:
+  `none` blocked scrolling inside modals/chat on touch devices. The 3D canvas and
+  the joystick opt out of gestures individually with `touch-none`.
+- The commander briefing starts collapsed on phones (`innerWidth < 640` at mount)
+  and sits with the comms button/panel in one flex column, so their positions
+  follow the header height instead of hardcoded `top-*` offsets.
+- `Tactical3DScene` aims the reticle on `pointerdown` for touch pointers (a tap
+  emits no `pointermove`) and, on `(hover: none)` devices, drops the full-screen
+  CSS filter, caps pixel ratio at 1.25 and uses 1024px shadow maps for frame
+  rate. Desktop keeps the previous visuals.

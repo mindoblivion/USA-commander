@@ -24,18 +24,18 @@ export const TheaterSelectorModal: React.FC<TheaterSelectorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-slate-950 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-4xl max-h-[90dvh] bg-slate-950 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-800 flex items-center justify-between gap-2 bg-slate-900/60">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
               <Globe className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-tactical font-bold uppercase tracking-wider text-slate-100">
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-lg font-tactical font-bold uppercase tracking-wider text-slate-100 leading-tight">
                 Global Combat Theaters & Strategic Targets
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="hidden sm:block text-xs text-slate-400">
                 NORAD satellite network · Select an active operational strike zone
               </p>
             </div>
@@ -49,16 +49,17 @@ export const TheaterSelectorModal: React.FC<TheaterSelectorModalProps> = ({
           </button>
         </div>
 
-        {/* Recon Satellite Banner */}
-        <div className="relative h-28 w-full overflow-hidden border-b border-slate-800 shrink-0">
+        {/* Recon Satellite Banner — height follows its content on phones so the
+            headline never gets clipped on a narrow screen */}
+        <div className="relative w-full overflow-hidden border-b border-slate-800 shrink-0">
           <img
             src={satelliteReconImg}
             alt="Tactical Satellite Reconnaissance"
-            className="w-full h-full object-cover object-center"
+            className="absolute inset-0 w-full h-full object-cover object-center"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent" />
-          <div className="absolute inset-0 p-5 flex flex-col justify-center">
+          <div className="relative min-h-28 p-4 sm:p-5 flex flex-col justify-center">
             <div className="text-[10px] font-mono text-sky-400 uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>KEYHOLE-11 Reconnaissance Feed Active</span>
@@ -73,7 +74,7 @@ export const TheaterSelectorModal: React.FC<TheaterSelectorModalProps> = ({
         </div>
 
         {/* Theaters Grid */}
-        <div className="p-6 overflow-y-auto space-y-4">
+        <div className="p-4 sm:p-6 overflow-y-auto hud-scroll space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {theaters.map((th) => {
               const isActive = th.id === activeTheaterId;

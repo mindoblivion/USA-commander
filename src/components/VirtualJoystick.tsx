@@ -31,8 +31,6 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
   const [knobPos, setKnobPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isBoosting, setIsBoosting] = useState<boolean>(false);
 
-  const maxRadius = 45; // max pixel distance from center
-
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     setIsDragging(true);
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -45,6 +43,10 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
     const rect = containerRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
+
+    // Travel range follows the pad's actual size so the same component works
+    // at every viewport size and orientation (knob radius 28px + rim).
+    const maxRadius = Math.max(24, rect.width / 2 - 19);
 
     const deltaX = e.clientX - centerX;
     const deltaY = e.clientY - centerY;
@@ -116,14 +118,14 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
   return (
     <>
       {/* 1. ANALOG VIRTUAL JOYSTICK (BOTTOM-LEFT) */}
-      <div className="fixed bottom-6 left-6 z-40 select-none touch-none pointer-events-auto">
+      <div className="fixed hud-bottom hud-left hud-joystick z-40 select-none touch-none pointer-events-auto">
         <div
           ref={containerRef}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative w-32 h-32 rounded-full bg-slate-950/80 border-2 border-slate-700/80 backdrop-blur-xl shadow-[0_0_25px_rgba(0,0,0,0.85)] flex items-center justify-center cursor-grab active:cursor-grabbing transition-colors group hover:border-red-500/60"
+          className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-slate-950/80 border-2 border-slate-700/80 backdrop-blur-xl shadow-[0_0_25px_rgba(0,0,0,0.85)] flex items-center justify-center cursor-grab active:cursor-grabbing transition-colors group hover:border-red-500/60"
         >
           {/* Outer Compass & Crosshair Ticks */}
           <div className="absolute inset-2 rounded-full border border-slate-800/80 pointer-events-none" />
@@ -172,7 +174,7 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
       </div>
 
       {/* 2. ACTION CONTROLS & NITRO BOOST BUTTON (BOTTOM-RIGHT) */}
-      <div className="fixed bottom-6 right-6 z-40 select-none touch-none pointer-events-auto flex items-end gap-3">
+      <div className="fixed hud-bottom hud-right hud-actions z-40 select-none touch-none pointer-events-auto flex items-end gap-2 sm:gap-3">
         {/* Anti-SAM Countermeasure Flares */}
         {onDeployFlares && (
           <button
@@ -239,7 +241,8 @@ export const VirtualJoystick: React.FC<VirtualJoystickProps> = ({
             </div>
           </button>
 
-          <span className="text-[8px] font-mono text-slate-400 mt-2 bg-slate-950/70 px-1.5 py-0.5 rounded border border-slate-800">
+          {/* Keyboard hint only — meaningless on touch devices */}
+          <span className="hidden sm:block text-[8px] font-mono text-slate-400 mt-2 bg-slate-950/70 px-1.5 py-0.5 rounded border border-slate-800">
             [SPACE / HOLD]
           </span>
         </div>

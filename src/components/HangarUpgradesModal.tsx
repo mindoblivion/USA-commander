@@ -153,7 +153,7 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md">
-      <div className="relative w-full max-w-5xl max-h-[92vh] bg-slate-950 border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-5xl max-h-[92dvh] bg-slate-950 border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Top Secret Classified Header */}
         <div className="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/80">
           <div className="flex items-center gap-3">
@@ -188,19 +188,21 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-5 pt-2.5 border-b border-slate-800 bg-slate-950/60 overflow-x-auto no-scrollbar">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1 px-3 sm:px-5 pt-2.5 border-b border-slate-800 bg-slate-950/60 overflow-x-auto no-scrollbar">
           <button
             onClick={() => {
               soundEngine.playRadioClick();
               setActiveTab('vehicles');
             }}
-            className={`px-4 py-2.5 text-xs font-tactical font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-b-2 whitespace-nowrap ${
+            className={`shrink-0 px-3 sm:px-4 py-2.5 text-xs font-tactical font-bold rounded-t-xl transition-all cursor-pointer flex items-center gap-2 border-b-2 whitespace-nowrap ${
               activeTab === 'vehicles'
                 ? 'border-amber-400 text-amber-400 bg-slate-900'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Car className="w-4 h-4" /> 1. Combat Vehicles (Jeep, Tank, Helicopter, Jet)
+            <Car className="w-4 h-4 shrink-0" />
+            <span className="sm:hidden">1. Vehicles</span>
+            <span className="hidden sm:inline">1. Combat Vehicles (Jeep, Tank, Helicopter, Jet)</span>
           </button>
           <button
             onClick={() => {
@@ -213,7 +215,9 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Wrench className="w-4 h-4" /> 2. Vehicle Modifications (Plow, Guns, Armor)
+            <Wrench className="w-4 h-4 shrink-0" />
+            <span className="sm:hidden">2. Mods</span>
+            <span className="hidden sm:inline">2. Vehicle Modifications (Plow, Guns, Armor)</span>
           </button>
           <button
             onClick={() => {
@@ -226,7 +230,9 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Plane className="w-4 h-4" /> 3. USAF Aerial & Strategic Bombers
+            <Plane className="w-4 h-4 shrink-0" />
+            <span className="sm:hidden">3. Airstrikes</span>
+            <span className="hidden sm:inline">3. USAF Aerial & Strategic Bombers</span>
           </button>
           <button
             onClick={() => {
@@ -239,7 +245,9 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Cpu className="w-4 h-4" /> 4. Pentagon Blueprint Crafting Lab
+            <Cpu className="w-4 h-4 shrink-0" />
+            <span className="sm:hidden">4. Blueprints</span>
+            <span className="hidden sm:inline">4. Pentagon Blueprint Crafting Lab</span>
           </button>
           <button
             onClick={() => {
@@ -252,12 +260,14 @@ export const HangarUpgradesModal: React.FC<HangarUpgradesModalProps> = ({
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Crosshair className="w-4 h-4" /> 5. Experimental Armory Calibration Bench
+            <Crosshair className="w-4 h-4 shrink-0" />
+            <span className="sm:hidden">5. Calibration</span>
+            <span className="hidden sm:inline">5. Experimental Armory Calibration Bench</span>
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 overflow-y-auto space-y-4 flex-1">
+        <div className="p-3 sm:p-5 overflow-y-auto hud-scroll space-y-4 flex-1">
           {/* TAB 1: COMBAT VEHICLES */}
           {activeTab === 'vehicles' && (
             <div className="space-y-4">
