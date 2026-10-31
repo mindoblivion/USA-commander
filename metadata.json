@@ -1,0 +1,6 @@
+{
+  "name": "USA Commander: Tactical Strike 3D",
+  "description": "Real-time 3D tactical warfare simulator. Take direct presidential orders, deploy stealth bombers, upgrade strategic ordnance, and command global combat theaters with realistic 3D residential environments and military tactical HUD telemetry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
