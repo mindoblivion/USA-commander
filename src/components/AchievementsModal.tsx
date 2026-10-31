@@ -31,7 +31,7 @@ export const ACHIEVEMENTS_LIST: AchievementDefinition[] = [
   {
     id: 'nuclear_pioneer',
     title: 'Nuclear Pioneer',
-    description: 'Successfully construct and detonate a GBU-43/B MOAB or Trident Nuclear ICBM.',
+    description: 'Successfully construct and deploy a GBU-43/B MOAB or Thunder Bomb.',
     medalIcon: '☢️',
     requirementDescription: 'Detonate a heavy thermonuclear asset',
     category: 'SPECIAL OPERATIONS'

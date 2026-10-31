@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Volume2, VolumeX, Award, ChevronUp, ChevronDown, CheckCircle2, AlertOctagon, Flame } from 'lucide-react';
 import { PresidentialDirective } from '../types/game';
-import trumpTalkIcon from '../assets/images/trump_talk_icon_1790990898845.jpg';
-import trumpFailIcon from '../assets/images/trump_fail_icon_1790990913452.jpg';
 
-interface PresidentialBriefingProps {
+const COMMANDER_PORTRAIT = '/art/commander_portrait.png';
+
+interface CommanderBriefingProps {
   directive: PresidentialDirective;
   onClaimBonus: (directiveId: string) => void;
   onPlaySpeech: (text: string) => void;
@@ -13,7 +13,7 @@ interface PresidentialBriefingProps {
   isUnderperforming?: boolean;
 }
 
-export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
+export const CommanderBriefing: React.FC<CommanderBriefingProps> = ({
   directive,
   onClaimBonus,
   onPlaySpeech,
@@ -27,10 +27,8 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
   const isAngry = isUnderperforming || forcedAngry || !!directive.failed;
 
   const currentSpeech = isAngry
-    ? (directive.angryQuote || "Total disaster! What are you doing?! You're under-performing, folks! Step on the gas, crush those houses, or you are FIRED!")
+    ? (directive.angryQuote || "Total disaster! What are you doing?! You're under-performing, Commander! Step on the gas, crush those structures, or you are FIRED!")
     : directive.quote;
-
-  const activeAvatar = isAngry ? trumpFailIcon : trumpTalkIcon;
 
   return (
     <div className={`relative backdrop-blur-md rounded-xl overflow-hidden shadow-2xl transition-all duration-300 ${
@@ -59,14 +57,14 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
             isAngry ? 'text-red-300 flex items-center gap-1' : 'text-amber-300'
           }`}>
             {isAngry && <Flame className="w-3 h-3 text-red-400" />}
-            {isAngry ? 'POTUS ENRAGED · MISSION REPRIMAND' : 'White House Situation Room · Direct Dispatch'}
+            {isAngry ? 'COMMANDER ENRAGED · MISSION REPRIMAND' : 'HQ Command Center · Direct Dispatch'}
           </span>
         </div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => onPlaySpeech(currentSpeech)}
-            title="Listen to Commander-in-Chief order"
+            title="Listen to Commander order"
             className={`p-1 rounded transition-colors cursor-pointer ${
               isAngry ? 'hover:bg-red-500/20 text-red-300' : 'hover:bg-amber-500/20 text-amber-300'
             }`}
@@ -75,7 +73,7 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
           </button>
           <button
             onClick={onToggleVoice}
-            title={voiceEnabled ? 'Mute presidential voiceover' : 'Enable presidential voiceover'}
+            title={voiceEnabled ? 'Mute commander voiceover' : 'Enable commander voiceover'}
             className="p-1 hover:bg-slate-800 text-slate-400 hover:text-amber-300 rounded transition-colors cursor-pointer"
           >
             {voiceEnabled ? <Volume2 className="w-3.5 h-3.5 text-amber-400" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -92,7 +90,7 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
       {/* Content Area */}
       {isExpanded && (
         <div className="p-3 flex items-start gap-3">
-          {/* Dynamic Presidential Big Bobblehead Avatar */}
+          {/* Dynamic Commander Avatar */}
           <div className="relative shrink-0 group">
             <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-2xl bg-slate-900 transition-all animate-bobble ${
               isAngry
@@ -100,17 +98,17 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
                 : 'border-4 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.6)]'
             }`}>
               <img
-                src={activeAvatar}
-                alt={isAngry ? "Enraged Commander-in-Chief" : "Commander-in-Chief Donald J. Trump"}
+                src={COMMANDER_PORTRAIT}
+                alt={isAngry ? "Enraged Commander" : "Faction Commander"}
                 className="w-full h-full object-cover object-top scale-110"
                 referrerPolicy="no-referrer"
               />
             </div>
-            
+
             <div className={`absolute -bottom-1 -right-1 font-bold text-[8px] font-mono px-1 rounded shadow ${
               isAngry ? 'bg-red-600 text-white animate-bounce' : 'bg-amber-500 text-slate-950'
             }`}>
-              {isAngry ? 'ENRAGED' : 'POTUS'}
+              {isAngry ? 'ENRAGED' : 'COMMANDER'}
             </div>
 
             {/* Quick Toggle for testing angry state */}
@@ -119,11 +117,11 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
                 const next = !forcedAngry;
                 setForcedAngry(next);
                 if (next) {
-                  onPlaySpeech("Total disaster! What are you doing?! You're under-performing, folks! Step on the gas, crush those houses, or you are FIRED!");
+                  onPlaySpeech("Total disaster! What are you doing?! You're under-performing, Commander! Step on the gas, crush those structures, or you are FIRED!");
                 }
               }}
               className="absolute -top-1.5 -left-1.5 p-0.5 rounded-full bg-slate-900 border border-slate-700 text-slate-400 hover:text-red-400 text-[8px] opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-              title="Toggle Trump Angry / Normal Reaction"
+              title="Toggle Commander Angry / Normal Reaction"
             >
               <AlertOctagon className="w-2.5 h-2.5" />
             </button>
@@ -177,7 +175,7 @@ export const PresidentialBriefing: React.FC<PresidentialBriefingProps> = ({
                   className="mt-2 w-full py-1.5 px-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-bold text-xs rounded-lg flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer"
                 >
                   <Award className="w-3.5 h-3.5" />
-                  Claim ${directive.cashBonus.toLocaleString()} Presidential Bounty
+                  Claim ${directive.cashBonus.toLocaleString()} Commander Bounty
                 </button>
               )}
 

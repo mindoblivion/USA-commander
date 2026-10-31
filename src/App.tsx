@@ -31,8 +31,9 @@ import { soundEngine } from './audio/soundEngine';
 import { BootSplashScreen } from './components/BootSplashScreen';
 import { TacticalTopBar } from './components/TacticalTopBar';
 import { Tactical3DScene } from './components/Tactical3DScene';
-import { PresidentialBriefing } from './components/PresidentialBriefing';
-import { VirtualJoystick, JoystickVector } from './components/VirtualJoystick';
+import { CommanderBriefing } from './components/CommanderBriefing';
+import { VirtualJoystick } from './components/VirtualJoystick';
+import type { JoystickVector } from './components/VirtualJoystick';
 import { HangarUpgradesModal } from './components/HangarUpgradesModal';
 import { TheaterSelectorModal } from './components/TheaterSelectorModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -319,7 +320,7 @@ export default function App() {
   // Active weapon asset
   const activeAsset = strikeAssets.find((a) => a.id === selectedAssetId) || strikeAssets[0];
 
-  // Current presidential directive
+  // Current commander directive
   const currentDirective = directives[activeDirectiveIndex] || directives[0];
 
   // Destruction percentage calculation
@@ -383,7 +384,7 @@ export default function App() {
                 setTimeout(() => triggerUnlockMedal('road_warrior', 'Road Warrior', '🎖️'), 600);
               }
 
-              // Check Presidential Directive progress
+              // Check Commander Directive progress
               setDirectives((prevDir) =>
                 prevDir.map((dir, idx) => {
                   if (idx !== activeDirectiveIndex || dir.completed) return dir;
@@ -559,7 +560,7 @@ export default function App() {
                       const completed = newAmount >= dir.targetAmount;
                       if (completed && !dir.completed) {
                         soundEngine.speakPresidentialOrder(
-                          "Tremendous work, General! Direct order completed. Claim your White House bounty!",
+                          "Tremendous work, Commander! Direct order completed. Claim your HQ bounty!",
                           settings.presidentialVoice,
                           settings.presidentialVoiceVolume
                         );
@@ -746,7 +747,7 @@ export default function App() {
     }
   };
 
-  // Claim Presidential Directive Bonus
+  // Claim Commander Directive Bonus
   const handleClaimDirectiveBonus = (directiveId: string) => {
     const dir = directives.find((d) => d.id === directiveId);
     if (!dir || !dir.completed || dir.claimed) return;
@@ -755,7 +756,7 @@ export default function App() {
     setTotalDevastationCash((prev) => prev + dir.cashBonus);
     soundEngine.playCashEarned();
     confetti({ particleCount: 80, spread: 60 });
-    addCombatLog(`CLAIMED White House bounty +$${dir.cashBonus.toLocaleString()} from President Trump!`);
+    addCombatLog(`CLAIMED HQ bounty +$${dir.cashBonus.toLocaleString()} from the Commander!`);
 
     setDirectives((prev) =>
       prev.map((d) => (d.id === directiveId ? { ...d, claimed: true } : d))
@@ -1024,9 +1025,9 @@ export default function App() {
           onReticleMove={(x, z) => setReticlePos({ x, z })}
         />
 
-        {/* FIXED FLOATING PRESIDENTIAL BRIEFING DRAWER */}
+        {/* FIXED FLOATING COMMANDER BRIEFING DRAWER */}
         <div className="fixed top-14 left-3 sm:left-4 z-30 max-w-[290px] sm:max-w-sm w-full pointer-events-auto">
-          <PresidentialBriefing
+          <CommanderBriefing
             directive={currentDirective}
             onClaimBonus={handleClaimDirectiveBonus}
             onPlaySpeech={(text) =>

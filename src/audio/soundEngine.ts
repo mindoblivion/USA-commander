@@ -273,7 +273,7 @@ class SoundEngine {
   }
 
   /**
-   * Direct Presidential Voice Dispatch using Web Speech API
+   * Direct Commander Voice Dispatch using Web Speech API
    */
   public speakPresidentialOrder(text: string, enabled: boolean = true, volume: number = 0.9) {
     if (!enabled || !('speechSynthesis' in window)) return;
@@ -281,7 +281,7 @@ class SoundEngine {
       window.speechSynthesis.cancel(); // Cancel any ongoing speech
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.05; // Confident, brisk delivery
-      utterance.pitch = 0.88; // Lower presidential tone
+      utterance.pitch = 0.88; // Lower commander tone
       utterance.volume = volume;
 
       const voices = window.speechSynthesis.getVoices();

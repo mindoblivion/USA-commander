@@ -42,7 +42,7 @@ export interface StrikeAsset {
   id: string;
   name: string;
   code: string;
-  category: 'Air Support' | 'Strategic Bomber' | 'Heavy Munition' | 'Orbital' | 'Nuclear';
+  category: 'Air Support' | 'Strategic Bomber' | 'Heavy Munition' | 'Orbital' | 'Strategic';
   description: string;
   baseDamage: number;
   damage: number;

@@ -341,11 +341,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </div>
 
-              {/* Presidential Voiceover Volume */}
+              {/* Commander Voiceover Volume */}
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-tactical font-bold text-slate-300 uppercase tracking-wider">
-                    Presidential Directives Voiceover
+                    Commander Directives Voiceover
                   </label>
                   <span className="text-xs font-mono text-amber-400">
                     {Math.round(settings.presidentialVoiceVolume * 100)}%
@@ -368,7 +368,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between">
                   <div>
-                    <div className="text-xs font-tactical font-bold text-slate-200">Presidential Audio Voice</div>
+                    <div className="text-xs font-tactical font-bold text-slate-200">Commander Audio Voice</div>
                     <div className="text-[10px] text-slate-400">Synthesize verbal orders from Trump</div>
                   </div>
                   <input
