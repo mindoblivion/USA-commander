@@ -1,0 +1,43 @@
+# Base44 development environment for USA Commander: Tactical Strike 3D.
+# Single Vite + React + Three.js client. No backend process: the app reads and
+# writes its campaign save to localStorage and only uses Firebase for optional
+# cloud sync (invalid/absent Firebase keys simply fall back to local mode).
+#
+# Dev-mode wiring: the cloned source is bind-mounted at /app and the Vite dev
+# server (node_modules kept in a named volume) serves live source on port 3000,
+# so edits hot-reload. `npm ci` in the startup command keeps dependencies in the
+# volume in sync with package-lock.json; it never touches a database volume.
+
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    command:
+      - sh
+      - -ec
+      - "npm ci --no-audit --no-fund && exec npm run dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - web_node_modules:/app/node_modules
+    environment:
+      # Platform-provided flag, forwarded as-is (absent/unset keeps original behavior).
+      - BASE44_PREVIEW_MODE
+      # Vite >= 6.1 appends this to server.allowedHosts so the preview proxy host
+      # is accepted. Passed bare: the platform supplies the value.
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 240s
+    restart: on-failure
+
+volumes:
+  web_node_modules:
