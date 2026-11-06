@@ -12,8 +12,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@base44/sdk": "^0.8.57",
-    "@base44/vite-plugin": "^1.0.50",
+    "@base44/sdk": "^0.8.59",
+    "@base44/vite-plugin": "^1.0.52",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.3.3",
     "canvas-confetti": "^1.9.4",
